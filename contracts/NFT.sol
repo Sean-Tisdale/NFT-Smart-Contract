@@ -17,55 +17,46 @@ contract NFT is ERC721 {
         baseTokenURI = "";
     }
 
-    event Mint(
-        address _owner,
-        uint256 _tokenId,
-        uint256 _priceAmount,
-        string _metadataCid
-    );
-    event Bought(address _to, address _from, uint256 _tokenId);
-    event Sale(address _from, address _to, uint256 _tokenId, bytes _data);
-
-    function _baseURI() internal view virtual override returns (string memory) {
-        return baseTokenURI;
-    }
+    event Mint(address owner, uint256 tokenId, string metadataCid);
+    event Sale(address from, address to, uint256 tokenId);
+    event Bought(address to, address from, uint256 tokenId);
 
     function setBaseTokenURI(string memory _baseTokenURI) public {
         baseTokenURI = _baseTokenURI;
     }
 
-    function mint(
-        address _to,
-        uint256 _priceAmount,
-        string memory _metadataCid
-    ) public payable returns (uint256) {
+    function mint(address to, string memory metadataCid)
+        public
+        payable
+        returns (uint256)
+    {
         currentTokenId.increment();
         uint256 newItemId = currentTokenId.current();
-        _safeMint(_to, newItemId);
-        emit Mint(msg.sender, newItemId, _priceAmount, _metadataCid);
+        setBaseTokenURI(baseTokenURI);
+        _mint(to, newItemId);
+
+        emit Mint(msg.sender, newItemId, metadataCid);
 
         return newItemId;
     }
 
-    // function buy(_saleId, uint256 _tokenId, address _to, address _from) {
-
-    // emit Bought();
-    // }
-    // function sell(address _from, address _to, uint256 _tokenId, string memory _metadataCid) public payable  {
-
-    // safeTransferFrom(_from, _to, _tokenId);
-
-    // emit Sale(_from, _to, _tokenId, _metadataCid);
-
-    // }
     function sell(
-        address _from,
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
+        address from,
+        address to,
+        uint256 tokenId
     ) public payable {
-        safeTransferFrom(_from, _to, _tokenId);
+        safeTransferFrom(from, to, tokenId);
 
-        emit Sale(_from, _to, _tokenId, _data);
+        emit Sale(from, msg.sender, tokenId);
+    }
+
+    function buy(
+        uint256 tokenId,
+        address to,
+        address from
+    ) public payable {
+        safeTransferFrom(to, from, tokenId);
+
+        emit Bought(msg.sender, from, tokenId);
     }
 }
