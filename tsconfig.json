@@ -4,7 +4,8 @@
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist",
+    "outDir": "./dist",
+    "rootDirs": ["./src", "./scripts", "./test"],
     "declaration": true
   },
   "include": ["./scripts", "./test", "./typechain"],
